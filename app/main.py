@@ -53,6 +53,7 @@ async def home():
 
 error_time: datetime = datetime.timestamp()
 
+app.include_router(admin_router_v1, prefix=settings.API_VERSION_1, tags=["Admin"])
 app.include_router(author_router_v1, prefix=settings.API_VERSION_1, tags=["AuthorsV1"])
 app.include_router(book_router_v1, prefix=settings.API_VERSION_1, tags=["BooksV1"])
 app.include_router(
@@ -61,7 +62,6 @@ app.include_router(
 app.include_router(
     penalty_router_v1, prefix=settings.API_VERSION_1, tags=["PenaltiesV1"]
 )
-app.include_router(admin_router_v1, prefix=settings.API_VERSION_1, tags=["Admin"])
 app.include_router(users_router_v1, prefix=settings.API_VERSION_1, tags=["Users"])
 
 

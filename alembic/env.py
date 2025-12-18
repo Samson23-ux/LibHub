@@ -14,7 +14,6 @@ from app.models.books import (
     BookGenre
 )
 from app.models.borrow_history import BorrowHistory, Penalty
-from app.models.staff import Staff
 from app.models.users import User
 
 # this is the Alembic Config object, which provides
