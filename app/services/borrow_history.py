@@ -1,4 +1,4 @@
 class BorrowHistoryService:
     pass
 
-admin = BorrowHistoryService()
+borrow_history_service = BorrowHistoryService()

@@ -1,7 +1,14 @@
-from pydantic import BaseModel, EmailStr, ConfigDict
-from typing import Optional, Any
+import enum
 from uuid import UUID
 from datetime import datetime
+from typing import Optional, Any
+from pydantic import BaseModel, EmailStr, ConfigDict
+
+
+class UserRole(str, enum.Enum):
+    ADMIN: str = "admin"
+    LIBRARIAN: str = "librarian"
+    USER: str = "user"
 
 class UserBaseV1(BaseModel):
     full_name: str
@@ -24,6 +31,11 @@ class UserInDBV1(UserBaseV1):
     email_remainder_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ReactivateAccountV1(BaseModel):
+    full_name: str
+    current_password: str
 
 
 class UserUpdateV1(BaseModel):

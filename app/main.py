@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 
 
 from app.routers.v1.admin import admin_router_v1
+from app.routers.v1.auth import auth_router_v1
 from app.routers.v1.authors import author_router_v1
 from app.routers.v1.books import book_router_v1
 from app.routers.v1.borrow_history import borrow_history_router_v1
@@ -31,6 +32,7 @@ from app.errors import (
     PenaltyExistError,
     PenaltiesNotFoundError,
     PenaltyNotFoundError,
+    ServerError,
     StaffExistError,
     StaffNotFoundError,
     UserExistError,
@@ -53,7 +55,8 @@ async def home():
 
 error_time: datetime = datetime.timestamp()
 
-app.include_router(admin_router_v1, prefix=settings.API_VERSION_1, tags=["Admin"])
+app.include_router(admin_router_v1, prefix=settings.API_VERSION_1, tags=["AdminV1"])
+app.include_router(auth_router_v1, prefix=settings.API_VERSION_1, tags=["AuthV1"])
 app.include_router(author_router_v1, prefix=settings.API_VERSION_1, tags=["AuthorsV1"])
 app.include_router(book_router_v1, prefix=settings.API_VERSION_1, tags=["BooksV1"])
 app.include_router(
@@ -62,7 +65,7 @@ app.include_router(
 app.include_router(
     penalty_router_v1, prefix=settings.API_VERSION_1, tags=["PenaltiesV1"]
 )
-app.include_router(users_router_v1, prefix=settings.API_VERSION_1, tags=["Users"])
+app.include_router(users_router_v1, prefix=settings.API_VERSION_1, tags=["UsersV1"])
 
 
 @app.exception_handler(500)
@@ -74,11 +77,23 @@ async def internal_server_error(request, exc):
 
 
 app.add_exception_handler(
+    exc_class_or_status_code=ServerError,
+    handler=create_exception_handler(
+        status_code=500,
+        initial_detail={
+            "error_code": "Server error",
+            "message": "Oops! Something went wrong",
+            "timestamp": error_time,
+        },
+    ),
+)
+
+app.add_exception_handler(
     exc_class_or_status_code=AuthenticationError,
     handler=create_exception_handler(
         status_code=401,
         initial_detail={
-            "error_code": "Not Authenticated",
+            "error_code": "User Not Authenticated",
             "message": "User should sign up or sign in to accesss resource",
             "timestamp": error_time,
         },
@@ -90,7 +105,7 @@ app.add_exception_handler(
     handler=create_exception_handler(
         status_code=403,
         initial_detail={
-            "error_code": "Not Authorized",
+            "error_code": "User Not Authorized",
             "message": "User does not have access to the resource",
             "timestamp": error_time,
         },

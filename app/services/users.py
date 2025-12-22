@@ -1,4 +1,7 @@
-class UserService:
-    pass
+from sqlalchemy.orm import Session
 
-admin = UserService()
+class UserService:
+    async def get_user_by_email(email: str, db: Session):
+        pass
+
+user_service = UserService()

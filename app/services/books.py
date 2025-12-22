@@ -1,4 +1,4 @@
 class BookService:
     pass
 
-admin = BookService()
+book_service = BookService()

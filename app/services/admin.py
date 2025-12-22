@@ -1,4 +1,4 @@
 class AdminService:
     pass
 
-admin = AdminService()
+admin_service = AdminService()

@@ -7,6 +7,7 @@ class Status(str, Enum):
     available: str = 'available'
     out_of_stock: str = 'out_of_stock'
 
+
 class BookBaseV1(BaseModel):
     title: str
     authors: list[str]
@@ -18,13 +19,16 @@ class BookBaseV1(BaseModel):
     description: Optional[str] = None
     status: Optional[Status] = None
 
+
 class BookInDBV1(BookBaseV1):
     id: UUID
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class BookCreateV1(BookBaseV1):
     pass
+
 
 class BookUpdateV1(BaseModel):
     title: Optional[str] = None
@@ -36,6 +40,7 @@ class BookUpdateV1(BaseModel):
     quantites: Optional[int] = None
     description: Optional[str] = None
     status: Optional[Status] = None
+
 
 class Response(BaseModel):
     message: Optional[str] = None

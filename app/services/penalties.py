@@ -1,4 +1,4 @@
 class PenaltyService:
     pass
 
-admin = PenaltyService()
+penalty_service = PenaltyService()

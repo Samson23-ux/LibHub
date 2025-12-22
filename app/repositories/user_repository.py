@@ -1,28 +1,36 @@
 from uuid import UUID
-from app.schemas.users import UserV1, UserCreateV1, UserUpdateV1
+from sqlalchemy.orm import Session
+
+from app.models.users import User, Role
+
 
 class UserRepo:
     async def get_users(
-            sort: str | None = None,
-            offset: int = 0,
-            limit: int = 0
-    ) -> list[UserV1]:
+        sort: str | None = None, offset: int = 0, limit: int = 0
+    ) -> list[User]:
         pass
 
-
-    async def get_user(user_id: UUID) -> UserV1:
+    async def get_userby_id(user_id: UUID) -> User:
         pass
 
+    async def get_user_by_email(email: str, db: Session) -> User:
+        user = db.query(User).filter(email == User.email).first()
+        return user
 
-    async def create_user(user_create: UserCreateV1) -> UserV1:
+    async def get_role_id(user_role: str, db: Session) -> str:
+        role = db.query(Role).filter(user_role == Role.name)
+        return role.id
+
+    async def create_user(user: User, db: Session):
+        db.add(user)
+        db.flush()
+        db.refresh(user)
+
+    async def update_user(user_update: User, user_id: UUID):
         pass
-
-
-    async def update_user(user_update: UserUpdateV1, user_id: UUID) -> UserV1:
-        pass
-
 
     async def delete_user(user_id: UUID):
         pass
+
 
 user_repo = UserRepo()

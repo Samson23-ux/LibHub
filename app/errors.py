@@ -6,12 +6,16 @@ class LibraryException(Exception):
     '''Base Exception for all Errors'''
     pass
 
+class ServerError(LibraryException):
+    '''Internal Server Error'''
+    pass
+
 class AuthenticationError(LibraryException):
     '''User provided an invalid token'''
     pass
 
 class AuthorizationError(LibraryException):
-    '''User provided an invalid token'''
+    '''User not authorized'''
     pass
 
 class EmailError(LibraryException):

@@ -1,4 +1,4 @@
 class AuthorService:
     pass
 
-admin = AuthorService()
+author_service = AuthorService()
