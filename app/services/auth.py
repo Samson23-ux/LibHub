@@ -9,7 +9,7 @@ from app.models.users import RefreshToken
 from app.schemas.auth import TokenData, Token
 from app.repositories.auth_repository import auth_repo
 from app.repositories.user_repository import user_repo
-from app.schemas.users import UserInDBV1, UserCreateV1
+from app.schemas.users import UserInDBV1, UserCreateV1, PasswordUpdate
 from app.errors import UserExistError, EmailError, PasswordError, AuthenticationError
 from app.utils import (
     hash_password,
@@ -49,7 +49,7 @@ class AuthService:
             id=token_id, user_id=user.id, token=refresh_token, expires_at=expire_time
         )
 
-        auth_repo.store_refresh_token(db_token, db)
+        auth_repo.add_refresh_token(db_token, db)
 
         token = Token(token=access_token, token_type='Bearer')
         data = {'access_token': token, 'refresh_token': refresh_token}
@@ -67,7 +67,7 @@ class AuthService:
 
         db_refresh_token.status = 'used'
         db_refresh_token.used_at = datetime.now()
-        auth_repo.update_refresh_token(db_refresh_token, db)
+        auth_repo.add_refresh_token(db_refresh_token, db) #update refresh token
 
         token_data = TokenData(email=payload.get('sub'))
         access_token = create_access_token(token_data)
@@ -77,7 +77,7 @@ class AuthService:
             id=token_id, user_id=refresh_token.user_id, token=refresh_token, expires_at=expire_time
         )
 
-        auth_repo.store_refresh_token(new_db_refresh_token, db)
+        auth_repo.add_refresh_token(new_db_refresh_token, db)
 
         token = Token(token=access_token, token_type='Bearer')
         data = {'access_token': token, 'refresh_token': new_refresh_token}
@@ -90,7 +90,14 @@ class AuthService:
 
         refresh_token_db.status = 'revoked'
         refresh_token_db.revoked_at = datetime.now()
-        auth_repo.update_refresh_token(refresh_token_db, db)
+        auth_repo.add_refresh_token(refresh_token_db, db)
+
+    async def update_password(password_update: PasswordUpdate, user: User, db: Session):
+        if not verify_password(password_update.old_password, user.password):
+            raise PasswordError()
+        
+        user.password = hash_password(password_update.new_password)
+        user_repo.update_user(user, db)
 
 
 auth_service = AuthService()

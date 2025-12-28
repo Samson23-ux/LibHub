@@ -25,10 +25,10 @@ class UserCreateV1(UserBaseV1):
 
 class UserInDBV1(UserBaseV1):
     id: UUID
-    created_at: datetime
-    is_deleted: bool
-    delete_at: datetime
-    email_remainder_at: datetime
+    created_at: Optional[datetime] = None
+    is_deleted: Optional[bool] = None
+    delete_at: Optional[datetime] = None
+    email_remainder_at: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -47,8 +47,8 @@ class UserUpdateV1(BaseModel):
 
 
 class PasswordUpdate(BaseModel):
-    email: EmailStr
-    currrent_password: str
+    id: UUID
+    old_password: str
     new_password: str
 
 

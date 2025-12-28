@@ -30,6 +30,8 @@ class BorrowHistoryInDBV1(BorrowHistoryBaseV1):
     borrow_date: Optional[datetime] = None
     return_date: Optional[datetime] = None
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class BorrowHistoryCreateV1(BorrowHistoryBaseV1):
     pass

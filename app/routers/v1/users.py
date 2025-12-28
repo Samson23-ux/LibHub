@@ -1,9 +1,10 @@
 from uuid import UUID
-from fastapi import APIRouter, Query, Depends
-from app.schemas.users import UserCreateV1, UserUpdateV1, Response
-
-from app.dependencies import get_db
 from sqlalchemy.orm import Session
+from fastapi import APIRouter, Query, Depends
+
+from app.models.users import User
+from app.dependencies import get_db, get_current_user
+from app.schemas.users import UserUpdateV1, Response
 
 users_router_v1 = APIRouter()
 
@@ -19,7 +20,9 @@ async def get_users(
 
 
 @users_router_v1.get('/users/{user_id}/', status_code=200, response_model=Response)
-async def get_user(user_id: UUID, db: Session = Depends(get_db)):
+async def get_user(
+    user_id: UUID, user: User = Depends(get_current_user), db: Session = Depends(get_db)
+):
     pass
 
 

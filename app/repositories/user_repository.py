@@ -10,8 +10,9 @@ class UserRepo:
     ) -> list[User]:
         pass
 
-    async def get_userby_id(user_id: UUID) -> User:
-        pass
+    async def get_user_by_id(user_id: UUID, db: Session) -> User:
+        user = db.query(User).filter(User.id == user_id)
+        return user
 
     async def get_user_by_email(email: str, db: Session) -> User:
         user = db.query(User).filter(email == User.email).first()
@@ -26,10 +27,12 @@ class UserRepo:
         db.flush()
         db.refresh(user)
 
-    async def update_user(user_update: User, user_id: UUID):
-        pass
+    async def update_user(user: User, db: Session):
+        db.add(user)
+        db.flush()
+        db.refresh(user)
 
-    async def delete_user(user_id: UUID):
+    async def delete_user(db: Session):
         pass
 
 

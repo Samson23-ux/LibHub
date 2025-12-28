@@ -1,11 +1,12 @@
-from sqlalchemy.orm import Session
 from typing import Optional
+from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, Form, Response as re, Cookie
 
-from app.dependencies import get_db
+from app.models.users import User
 from app.errors import ServerError
 from app.services.auth import auth_service
-from app.schemas.users import UserCreateV1, Response
+from app.dependencies import get_db, get_current_user
+from app.schemas.users import UserCreateV1, PasswordUpdate, Response
 
 
 auth_router_v1 = APIRouter()
@@ -43,7 +44,10 @@ async def sign_in(
 
 @auth_router_v1.post('/auth/token/refresh/', status_code=201, response_model=Response)
 async def create_new_token(
-    refresh_token: Optional[str] = Cookie(None), db: Session = Depends(get_db)
+    #request for a new access token with a valid refresh token
+    refresh_token: Optional[str] = Cookie(None),
+    _=Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
     try:
         data = await auth_service.create_new_token(refresh_token, db)
@@ -60,8 +64,26 @@ async def create_new_token(
         raise ServerError() from e
 
 
+@auth_router_v1.patch('/auth/password_reset/', status_code=200, response_model=Response)
+async def update_password(
+    password_update: PasswordUpdate,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        auth_service.update_password(password_update, user, db)
+        return Response(message='Password updated successfully')
+    except Exception as e:
+        db.rollback()
+        raise ServerError() from e
+
+
 @auth_router_v1.patch('/auth/sign-out', status_code=200, response_model=Response)
-async def sign_out(refresh_token: Optional[str] = Cookie(None), db: Session = Depends(get_db)):
+async def sign_out(
+    refresh_token: Optional[str] = Cookie(None),
+    _=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     try:
         auth_service.sign_out(refresh_token, db)
         return Response(message='Sign out completed successfully')
