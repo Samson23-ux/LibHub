@@ -27,7 +27,7 @@ class AuthService:
         role_id = await user_repo.get_role_id(user_create.role, db)
 
         user_create.password = hash_password(user_create.password)
-        user_in_db = User(**user_create.model_dump(exclude={'role'}), role_if=role_id)
+        user_in_db = User(**user_create.model_dump(exclude={'role'}), role_id=role_id)
 
         user_repo.create_user(user_in_db, db)
         user = await user_repo.get_user_by_email(user_create.email, db)
